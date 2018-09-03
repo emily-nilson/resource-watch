@@ -5,6 +5,8 @@ import classnames from 'classnames';
 // Redux
 import { Link } from 'routes';
 
+import posed from 'react-pose';
+
 // Components
 import Icon from 'components/ui/Icon';
 import LoginRequired from 'components/ui/login-required';
@@ -39,9 +41,7 @@ class DatasetListItem extends React.Component {
     responsive: PropTypes.object
   };
 
-  static defaultProps = {
-    mode: 'grid'
-  }
+  static defaultProps = { mode: 'grid' }
 
   /**
    * HELPER
@@ -65,9 +65,7 @@ class DatasetListItem extends React.Component {
    * - renderChart
   */
   renderChart = () => {
-    const {
-      dataset, widget, layer, mode
-    } = this.props;
+    const { dataset, widget, layer, mode } = this.props;
 
     const isWidgetMap = widget && widget.widgetConfig.type === 'map';
     const isEmbedWidget = widget && widget.widgetConfig.type === 'embed';
@@ -100,9 +98,7 @@ class DatasetListItem extends React.Component {
   }
 
   render() {
-    const {
-      dataset, metadata, mode, user, actions, tags, responsive
-    } = this.props;
+    const { dataset, metadata, mode, user, actions, tags, responsive, hostRef } = this.props;
 
 
     const isInACollection = belongsToACollection(user, dataset);
@@ -117,7 +113,7 @@ class DatasetListItem extends React.Component {
     });
 
     return (
-      <div className={`c-dataset-list-item -${mode}`}>
+      <div ref={hostRef} className={`c-dataset-list-item -${mode}`}>
         {/* CHART */}
         <MediaQuery
           minDeviceWidth={breakpoints.medium}
@@ -210,4 +206,19 @@ class DatasetListItem extends React.Component {
   }
 }
 
-export default DatasetListItem;
+export default posed(DatasetListItem)({
+  enter: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: props => ({
+      type: 'spring',
+      delay: props.i * 200
+    })
+  },
+  exit: {
+    opacity: 0,
+    x: 0,
+    y: -20
+  }
+});

@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
+import { PoseGroup } from 'react-pose';
+
 // Components
 import DatasetListItem from 'components/datasets/list/list-item';
 
@@ -25,9 +27,7 @@ class DatasetList extends PureComponent {
   }
 
   render() {
-    const {
-      list, mode, actions, tags, grid
-    } = this.props;
+    const { list, mode, actions, tags, grid } = this.props;
 
     const columnClassName = classNames({
       column: true,
@@ -44,22 +44,27 @@ class DatasetList extends PureComponent {
         <div className="row">
           <div className="column small-12">
             <div className="l-row -equal-height row">
-              {list.map(dataset => (
+              {list.map((dataset, i) => (
                 <div
                   className={columnClassName}
                   key={dataset.id}
                 >
-                  <DatasetListItem
-                    dataset={dataset}
-                    widget={dataset.widget ? dataset.widget.find(w => w.default) : null}
-                    layer={dataset.layer ? dataset.layer.find(l => l.default) : null}
-                    metadata={dataset.metadata}
-                    vocabulary={dataset.vocabulary ?
-                      dataset.vocabulary.find(v => v.name === 'knowledge_graph') || {} : null}
-                    mode={mode}
-                    actions={actions}
-                    tags={tags}
-                  />
+                  <PoseGroup
+                    animateOnMount
+                  >
+                    <DatasetListItem
+                      i={i}
+                      dataset={dataset}
+                      widget={dataset.widget ? dataset.widget.find(w => w.default) : null}
+                      layer={dataset.layer ? dataset.layer.find(l => l.default) : null}
+                      metadata={dataset.metadata}
+                      vocabulary={dataset.vocabulary ?
+                        dataset.vocabulary.find(v => v.name === 'knowledge_graph') || {} : null}
+                      mode={mode}
+                      actions={actions}
+                      tags={tags}
+                    />
+                  </PoseGroup>
                 </div>
               ))}
             </div>
