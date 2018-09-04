@@ -12,7 +12,7 @@ import { getDatasetDefaultEditableWidget } from 'layout/explore-detail/explore-d
 
 // Vega
 import * as vega from 'vega';
-import { widgetHelper, getVegaTheme } from 'widget-editor';
+import { getVegaTheme } from 'widget-editor';
 
 
 // DATASET
@@ -48,7 +48,7 @@ export const fetchDatasetThumbnail = createThunkAction('EXPLORE-DETAIL/fetchData
 
   const widgetConfig = {
     ...defaultWidget.widgetConfig,
-    config: getVegaTheme(),
+    config: getVegaTheme(true),
     width: 400,
     height: 300,
     autosize: {
@@ -65,68 +65,14 @@ export const fetchDatasetThumbnail = createThunkAction('EXPLORE-DETAIL/fetchData
     .initialize()
     .runAsync()
       .then(() => {
-        console.log(view.data('table'))
+        view
+          .toImageURL('png')
+            .then((url) => {
+              dispatch(setDatasetThumbnail(url));
+            })
+            .catch((err) => { console.error(err); });
       })
-
-  // return getVegaConfig(widgetConfig)
-  //   .then((config) => {
-  //     const runtime = vega.parse(config);
-  //     const view = new vega.View(runtime);
-
-  //     view
-  //       .renderer('none')
-  //       .initialize()
-  //       .runAsync()
-  //       .then((v) => {
-  //         console.log(v);
-  //       })
-
-
-  //     return view
-  //       .renderer('none')
-  //       .initialize()
-  //       .run()
-  //       .toImageURL('png')
-  //       .then((url) => {
-  //         dispatch(setDatasetThumbnail(url));
-  //       })
-  //       .catch((err) => { console.error(err); });
-  //   })
 });
-
-
-const getVegaConfig = (config) => {
-  // We toggle on the loading but we don't do it off because
-  // it will be done once the parsing of the Vega config is done
-
-  return new Promise((resolve, reject) => {
-    // If the widget represents a raster dataset, we need to fetch
-    // and parse the data
-    if (config.data[0].url) {
-      widgetHelper.fetchRasterData(
-        config.data[0].url,
-        config.data[0].format.band,
-        config.data[0].format.provider
-      )
-        .then((data) => {
-          const dataObj = Object.assign({}, config.data[0]);
-          dataObj.values = data;
-  
-          // If we don't remove the format and the URL, Vega won't use
-          // the data we pass in
-          delete dataObj.format;
-          delete dataObj.url;
-  
-          resolve(Object.assign(
-            {},
-            config,
-            { data: [dataObj].concat(config.data.slice(1, config.data.length)) }
-          ));
-        })
-        .catch(() => reject('Unable to get the raster data'));
-    }
-  });
-}
 
 // PARTNER
 export const setPartner = createAction('EXPLORE-DETAIL/setPartner');
