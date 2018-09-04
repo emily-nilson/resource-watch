@@ -14,18 +14,16 @@ import * as actions from 'layout/explore-detail/explore-detail-actions';
 import ExploreDetail from 'layout/explore-detail';
 
 import { PARTNERS_CONNECTIONS } from 'utils/partners/partnersConnections';
-import { TOOLS_CONNECTIONS } from 'utils/apps/toolsConnections';
 
 class ExploreDetailPage extends Page {
-  static propTypes = {
-    exploreDetail: PropTypes.object
-  };
+  static propTypes = { exploreDetail: PropTypes.object };
 
   static async getInitialProps(context) {
     const props = await super.getInitialProps(context);
     const { store, res } = context;
 
     await store.dispatch(actions.fetchDataset({ id: props.url.query.id }));
+    await store.dispatch(actions.fetchDatasetThumbnail());
 
     // Check if the dataset exists and it is published
     const { exploreDetail } = store.getState();
@@ -76,9 +74,7 @@ class ExploreDetailPage extends Page {
   }
 
   render() {
-    const {
-      exploreDetail
-    } = this.props;
+    const { exploreDetail } = this.props;
 
     const { data: dataset } = exploreDetail;
     if (dataset && !dataset.published) return <Error status={404} />;

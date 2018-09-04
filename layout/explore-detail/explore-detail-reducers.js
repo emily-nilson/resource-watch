@@ -13,6 +13,9 @@ export default {
   [actions.setDatasetError]: (state, action) =>
     ({ ...state, error: action.payload }),
 
+  [actions.setDatasetThumbnail]: (state, action) =>
+    ({ ...state, thumbnail: action.payload }),
+
 
   //
   // PARTNER

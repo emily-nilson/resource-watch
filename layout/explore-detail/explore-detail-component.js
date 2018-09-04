@@ -29,14 +29,10 @@ import {
 import { TOOLS_CONNECTIONS } from 'utils/apps/toolsConnections';
 
 class ExploreDetail extends Page {
-  static propTypes = {
-    exploreDetail: PropTypes.object
-  };
+  static propTypes = { exploreDetail: PropTypes.object };
 
   render() {
-    const {
-      exploreDetail
-    } = this.props;
+    const { exploreDetail } = this.props;
 
     const dataset = exploreDetail.data;
     const datasetName = getDatasetName(dataset);
@@ -62,6 +58,8 @@ class ExploreDetail extends Page {
               </div>
             </div>
           </div>
+
+          <img src={exploreDetail.thumbnail} alt={datasetName} />
 
           {/* DATASET INFO && ACTIONS */}
           <section className="l-section">
