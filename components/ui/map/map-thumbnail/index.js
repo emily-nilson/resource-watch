@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getLayerImage, getBasemapImage } from './helper';
+import { getLayerImage } from 'layer-manager';
+import { getBasemapImage } from './helper';
 
 class MapThumbnail extends React.Component {
   static propTypes = {

@@ -8,11 +8,11 @@ import GraphService from 'services/GraphService';
 
 // Helpers
 import { TAGS_BLACKLIST } from 'utils/tags';
-import { getDatasetDefaultEditableWidget } from 'layout/explore-detail/explore-detail-helpers';
 
-// Vega
+// Thumbnails
 import * as vega from 'vega';
 import { getVegaTheme } from 'widget-editor';
+import { getLayerImage } from 'layer-manager';
 
 
 // DATASET
@@ -43,35 +43,74 @@ export const fetchDataset = createThunkAction('EXPLORE-DETAIL/fetchDataset', (pa
 });
 
 export const fetchDatasetThumbnail = createThunkAction('EXPLORE-DETAIL/fetchDatasetThumbnail', () => (dispatch, getState) => {
-  const dataset = getState().exploreDetail.data;
-  const defaultWidget = getDatasetDefaultEditableWidget(dataset);
+  const state = getState();
+  
+  const dataset = state.exploreDetail.data;
+  if (!dataset) {
+    return;
+  }
 
-  const widgetConfig = {
-    ...defaultWidget.widgetConfig,
-    config: getVegaTheme(true),
-    width: 400,
-    height: 300,
-    autosize: {
-      type: 'fit',
-      contains: 'padding'
+  const { widget } = dataset;
+  if (!widget || !widget.length) {
+    return;
+  }
+
+  const defaultWidget = dataset.widget.find(w => w.defaultEditableWidget || w.default);
+  if (!defaultWidget) {
+    return;
+  }
+
+  const { widgetConfig } = defaultWidget;
+  const { type, layer_id } = widgetConfig;
+
+  switch (type) {
+    case 'map': {
+      return fetch(`${process.env.WRI_API_URL}/layer/${layer_id}`)
+        .then((response) => {
+          if (response.status >= 400) throw Error(response.statusText);
+          return response.json();
+        })
+        .then(body => WRISerializer(body, { locale: state.common.locale }))
+        .then((layer) => {
+          return getLayerImage({ layerSpec: layer })
+            .then((url) => {
+              dispatch(setDatasetThumbnail(url));
+            })
+
+        })
+
+      break;
     }
-  };
 
-  const runtime = vega.parse(widgetConfig);
-  const view = new vega.View(runtime);
+    default:
+      const widgetConfig = {
+        ...defaultWidget.widgetConfig,
+        config: getVegaTheme(true),
+        width: 400,
+        height: 300,
+        autosize: {
+          type: 'fit',
+          contains: 'padding'
+        }
+      };
 
-  return view
-    .renderer('canvas')
-    .initialize()
-    .runAsync()
-      .then(() => {
-        view
-          .toImageURL('png')
+      const runtime = vega.parse(widgetConfig);
+      const view = new vega.View(runtime);
+
+      return view
+        .renderer('canvas')
+        .initialize()
+        .runAsync()
+        .then(() => {
+          view
+            .toImageURL('png')
             .then((url) => {
               dispatch(setDatasetThumbnail(url));
             })
             .catch((err) => { console.error(err); });
-      })
+        })
+    break;
+  }
 });
 
 // PARTNER
