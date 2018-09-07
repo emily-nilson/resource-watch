@@ -85,7 +85,7 @@ export const fetchDatasetThumbnail = createThunkAction('EXPLORE-DETAIL/fetchData
     default:
       const widgetConfig = {
         ...defaultWidget.widgetConfig,
-        config: getVegaTheme(true),
+        config: getVegaTheme(),
         width: 400,
         height: 300,
         autosize: {
@@ -98,7 +98,7 @@ export const fetchDatasetThumbnail = createThunkAction('EXPLORE-DETAIL/fetchData
       const view = new vega.View(runtime);
 
       return view
-        .renderer('canvas')
+        .renderer('none')
         .initialize()
         .runAsync()
         .then(() => {
