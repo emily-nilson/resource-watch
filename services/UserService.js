@@ -92,9 +92,7 @@ export default class UserService {
   deleteFavourite(resourceId, token) {
     return fetch(`${this.opts.apiURL}/favourite/${resourceId}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: token
-      }
+      headers: { Authorization: token }
     })
       .then((response) => {
         if (response.ok) return response.json();
@@ -146,9 +144,7 @@ export default class UserService {
         type: 'EMAIL',
         content: user.email
       },
-      params: {
-        area: areaId
-      }
+      params: { area: areaId }
     };
 
     return fetch(`${this.opts.apiURL}/subscriptions`, {
@@ -166,7 +162,6 @@ export default class UserService {
    *  Update Subscription
    */
   updateSubscriptionToArea(subscriptionId, datasets, datasetsQuery, user, language) {
-
     const bodyObj = {
       application: process.env.APPLICATIONS,
       language: language || 'en',
@@ -190,11 +185,7 @@ export default class UserService {
    */
   getSubscriptions(token) {
     return new Promise((resolve) => {
-      fetch(`${this.opts.apiURL}/subscriptions?application=${process.env.APPLICATIONS}`, {
-        headers: {
-          Authorization: token
-        }
-      })
+      fetch(`${this.opts.apiURL}/subscriptions?application=${process.env.APPLICATIONS}`, { headers: { Authorization: token } })
         .then(response => response.json())
         .then(jsonData => resolve(jsonData.data));
     });
@@ -205,11 +196,7 @@ export default class UserService {
    */
   getSubscription(subscriptionId, token) {
     return new Promise((resolve) => {
-      fetch(`${this.opts.apiURL}/v1/subscriptions/${subscriptionId}/data`, {
-        headers: {
-          Authorization: token
-        }
-      })
+      fetch(`${this.opts.apiURL}/v1/subscriptions/${subscriptionId}/data`, { headers: { Authorization: token } })
         .then(response => response.json())
         .then(jsonData => resolve(jsonData.data));
     });
@@ -224,9 +211,7 @@ export default class UserService {
   deleteSubscription(subscriptionId, token) {
     return fetch(`${this.opts.apiURL}/subscriptions/${subscriptionId}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: token
-      }
+      headers: { Authorization: token }
     })
       .then(response => response.json());
   }
@@ -302,9 +287,7 @@ export default class UserService {
   deleteArea(areaId, token) {
     return fetch(`${this.opts.apiURL}/area/${areaId}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: token
-      }
+      headers: { Authorization: token }
     });
   }
 
@@ -338,7 +321,7 @@ export default class UserService {
           }
         };
 
-        return fetch(`${process.env.API_URL}/profiles`, {
+        return fetch(`${process.env.WRI_API_URL}/profile`, {
           method: 'POST',
           body: JSON.stringify(bodyObj),
           headers: {
