@@ -32,7 +32,7 @@ class TopicsTable extends React.Component {
   };
 
   static propTypes = {
-    authorization: PropTypes.string,
+    authorization: PropTypes.string.isRequired,
     // Store
     loading: PropTypes.bool.isRequired,
     topics: PropTypes.array.isRequired,
@@ -92,9 +92,7 @@ class TopicsTable extends React.Component {
         )}
 
         <SearchInput
-          input={{
-            placeholder: 'Search topic'
-          }}
+          input={{ placeholder: 'Search topic' }}
           link={{
             label: 'New topic',
             route: 'admin_topics_detail',
