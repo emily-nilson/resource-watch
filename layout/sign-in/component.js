@@ -60,10 +60,8 @@ class SigIn extends PureComponent {
             window.location.href = '/myrw';
           })
           .catch((err) => {
-            err.json()
-              .then(({ errors } = {}) => {
-                (errors || []).forEach(_error => toastr.error('Something went wrong', `${_error.status}:${_error.detail}`));
-              });
+            const { status, statusText } = err;
+            toastr.error('Something went wrong', `${status}: ${statusText}`);
           });
       }
     }, 0);

@@ -55,6 +55,7 @@ module.exports = (() => {
     // local sign-in
     signin: (req, res, done) =>
       passport.authenticate('local-signin', (err, user) => {
+        console.log(err, user)
         if (err) {
           return res.status(401).json({ status: 'error', message: err.statusText });
         }
