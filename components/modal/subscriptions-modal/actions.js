@@ -1,10 +1,12 @@
 import { createAction, createThunkAction } from 'redux-tools';
 import { toastr } from 'react-redux-toastr';
+import axios from 'axios';
 
 // services
 import AreasService from 'services/AreasService';
 import UserService from 'services/UserService';
 import DatasetService from 'services/DatasetService';
+import { fetchQuery } from 'services/query';
 
 const areasService = new AreasService({ apiURL: process.env.WRI_API_URL });
 const userService = new UserService({ apiURL: process.env.WRI_API_URL });
@@ -14,6 +16,10 @@ export const setSubscriptions = createAction('SUBSCRIPTIONS__SET-SUBSCRIPTIONS')
 export const setSubscriptionsLoading = createAction('SUBSCRIPTIONS__SET-SUBSCRIPTIONS-LOADING');
 export const setSubscriptionsError = createAction('SUBSCRIPTIONS__SET-SUBSCRIPTIONS-ERROR');
 export const clearSubscriptions = createAction('SUBSCRIPTIONS__CLEAR-SUBSCRIPTIONS');
+export const setAlertsPreview = createAction('ALERTS__SET-ALERTS-PREVIEW');
+export const setSubscriptionsLoadingPreview = createAction('ALERTS__SET-ALERTS-LOADING');
+export const setSubscriptionsErrorPreview = createAction('ALERTS__SET-ALERTS-ERROR');
+export const clearSubscriptionsPreview = createAction('ALERTS__CLEAR-ALERTS');
 
 export const getUserSubscriptions = createThunkAction('SUBSCRIPTIONS__GET-USER-SUBSCRIPTIONS', () =>
   (dispatch, getState) => {
@@ -33,6 +39,28 @@ export const getUserSubscriptions = createThunkAction('SUBSCRIPTIONS__GET-USER-S
       });
   });
 
+// actions - user subscriptions preview
+export const getUserSubscriptionsPreview = createThunkAction('SUBSCRIPTIONS__GET-USER-SUBSCRIPTIONS-PREVIEW', sql =>
+  (dispatch, getState) => {
+    const { user, subscriptions } = getState();
+    const { token } = user;
+    const { userSelection } = subscriptions;
+    const { datasets } = userSelection;
+    const temporal = "SELECT frp AS value, acq_date,  ST_AsGeoJSON(the_geom) as geom     FROM VIIRS-Active-Fire-Global-1490086842549  WHERE acq_date >= '2018-11-26' AND acq_date <= '2018-11-27'  ORDER BY acq_date DESC  LIMIT 10";
+    const fetchs = datasets.map(_dataset => fetchQuery(token, temporal));
+
+    dispatch(setSubscriptionsLoadingPreview(true));
+
+    axios.all(fetchs)
+      .then(axios.spread((...responses) => {
+        dispatch(setAlertsPreview(responses.map(response => response.data)));
+      }))
+      .catch((err) => {
+        dispatch(setSubscriptionsError(err));
+        toastr.error('Error loading preview', err);
+      })
+      .then(() => { dispatch(setSubscriptionsLoadingPreview(false)); });
+  });
 
 // actions – areas
 export const setAreas = createAction('SUBSCRIPTIONS__SET-AREAS');
@@ -200,7 +228,7 @@ export const createSubscriptionOnNewArea = createThunkAction('SUBSCRIPTIONS__CRE
       promises.push(promise);
     });
 
-    Promise.all(promises)
+    return Promise.all(promises)
       .then(() => {
         dispatch(setSubscriptionSuccess(false));
         dispatch(setSubscriptionLoading(true));
@@ -275,6 +303,7 @@ export default {
   setSubscriptionsLoading,
   setSubscriptionsError,
   getUserSubscriptions,
+  getUserSubscriptionsPreview,
 
   setUserAreas,
   setUserAreasLoading,
