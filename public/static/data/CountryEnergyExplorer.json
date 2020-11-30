@@ -200,6 +200,14 @@
               {
                 "id": "91721bdc-31ab-43b1-a3cd-4881f80186d8",
                 "widgetsPerRow": 2
+              },
+              {
+                "id": "a20184ec-3d14-49ac-97c0-61acccd6ebd1",
+                "widgetsPerRow": 2
+              },
+              {
+                "id": "84c4abe2-3218-488a-8266-41dd7521a01a",
+                "widgetsPerRow": 2
               }
             ]
         },
